@@ -44,7 +44,6 @@ class LogStash::Filters::URL < LogStash::Filters::Base
     url_parts = {}
     url_parts['scheme'] = scheme_split[0]
     authority = (url[/[\/]{2}([^\/]+)/] || '').gsub(/\/{1,2}/, '')
-    puts authority
     url_parts['port'] = authority[-6..-1][/:\d+/][1..-1].to_i if authority.length > 7 && authority[-6..-1][/:\d+/]
     userpass = authority[/[^@]+@/] if authority
     if userpass
