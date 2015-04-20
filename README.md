@@ -2,6 +2,8 @@
 
 Break a URL down into it's components and insert into a Logstash event
 
+Version 0.2
+
 # Can be used like this
 
 	logstash -f example.conf --pluginpath .

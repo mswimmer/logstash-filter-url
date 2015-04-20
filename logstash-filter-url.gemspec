@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   
   s.name          = "logstash-filter-url"
   s.require_paths = ["lib"]
-  s.version       = "0.1"
+  s.version       = "0.2"
 
   # Special flag to let us know this is actually a logstash plugin
   s.metadata = { "logstash_plugin" => "true", "logstash_group" => "filter" }
