@@ -353,5 +353,15 @@ describe LogStash::Filters::URL do
       insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "path"=>"/fsintf/c9f2549fce18f4dc4ae13d6a6527d9c4e/2/GJ3", "filename"=>"GJ3", "num_path"=>4, "querystring"=>"public&code=9734c07b688b9b0f93d49edb366f9d62", "query"=>[{:parameter=>"public", :values=>[]}, {:parameter=>"code", :values=>["9734c07b688b9b0f93d49edb366f9d62"]}], "num_query"=>2, "host"=>{"addr"=>{"ip"=>"180.153.147.73", "ipv4"=>"180.153.147.73", "port"=>80}}}
     end
   end
+
+    describe "parse url http://cm.hiido.com/cm/user?cm_tc&time=1429548780&domain=yy.com&zds=_736e7fd@yy|_e3d75f1@yy|www@yy|&hiido_ui=0.6427608964783057" do
+    config STDCONF
+    
+    event = { "source_url" => "http://cm.hiido.com/cm/user?cm_tc&time=1429548780&domain=yy.com&zds=_736e7fd@yy|_e3d75f1@yy|www@yy|&hiido_ui=0.6427608964783057" }
+    sample event do
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "hostname"=>"cm.hiido.com", "path"=>"/cm/user cm_tc&time 1429548780&domain yy.com&zds _736e7fd yy _e3d75f1 yy www yy &hiido_ui 0.6427608964783057", "filename"=>"user cm_tc&time 1429548780&domain yy.com&zds _736e7fd yy _e3d75f1 yy www yy &hiido_ui 0.6427608964783057", "num_path"=>2}
+    end
+  end
   
+
 end
