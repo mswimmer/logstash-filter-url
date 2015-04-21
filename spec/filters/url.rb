@@ -307,5 +307,40 @@ describe LogStash::Filters::URL do
     end
   end
 
+
+  describe "parse url http://58.64.176.71/Public/home/fonts/glyphicons-halflings-regular.eot?" do
+    config STDCONF
+    
+    event = { "source_url" => "http://58.64.176.71/Public/home/fonts/glyphicons-halflings-regular.eot?" }
+    sample event do
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "path"=>"/Public/home/fonts/glyphicons-halflings-regular.eot", "filename"=>"glyphicons-halflings-regular.eot", "num_path"=>4, "querystring"=>"", "host"=>{"addr"=>{"ip"=>"58.64.176.71", "ipv4"=>"58.64.176.71", "port"=>80}}}
+    end
+  end
+
+  describe "parse url http://3pjtx0jj-zxis6jz8.netdna-ssl.com/t.ashx?e=QHucCbLl+/brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC+drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS" do
+    config STDCONF
+    
+    event = { "source_url" => "http://3pjtx0jj-zxis6jz8.netdna-ssl.com/t.ashx?e=QHucCbLl+/brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC+drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS" }
+    #TODO: It's not clear how to split this URL up
+    sample event do
+      insist { subject["dest_url"] } == {
+        "scheme"=>"http",
+        "port"=>80,
+        "hostname"=>"3pjtx0jj-zxis6jz8.netdna-ssl.com",
+        "path"=>"/t.ashx",
+        "filename"=>"t.ashx",
+        "num_path"=>1,
+        "querystring"=>"e=QHucCbLl+/brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC+drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS",
+        "query"=> [
+          {
+            :parameter=>"",
+            :value=>"QHucCbLl+/brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC+drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS"
+          }
+        ],
+        "num_query"=>1}
+    end
+  end
+
+
   
 end
