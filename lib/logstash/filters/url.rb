@@ -57,7 +57,7 @@ class LogStash::Filters::URL < LogStash::Filters::Base
     url_parts['querystring'] = u.query if u.query
 
     if url_parts['querystring'] && url_parts['querystring'].length > 1      
-      url_parts['query'] = url_parts['querystring'][1..-1].split(/[;&]/).map{ |qkv| 
+      url_parts['query'] = url_parts['querystring'].split(/[;&]/).map{ |qkv| 
         kv = qkv.split(/=/)
         { parameter: kv[0], value: kv[1] } 
       }

@@ -65,7 +65,7 @@ describe LogStash::Filters::URL do
     
     event = { "source_url" => "http://user:password@example.com:8888/x/y/z?a=1&b=2&c=&d=4" }
     sample event do
-      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>8888, "username"=>"user", "password"=>"password", "hostname"=>"example.com", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3, "querystring"=>"a=1&b=2&c=&d=4", "query"=>[{:parameter=>"", :value=>"1"}, {:parameter=>"b", :value=>"2"}, {:parameter=>"c", :value=>nil}, {:parameter=>"d", :value=>"4"}], "num_query"=>4}
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>8888, "username"=>"user", "password"=>"password", "hostname"=>"example.com", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3, "querystring"=>"a=1&b=2&c=&d=4", "query"=>[{:parameter=>"a", :value=>"1"}, {:parameter=>"b", :value=>"2"}, {:parameter=>"c", :value=>nil}, {:parameter=>"d", :value=>"4"}], "num_query"=>4}
     end
   end
 
@@ -74,7 +74,7 @@ describe LogStash::Filters::URL do
     
     event = { "source_url" => "http://user:password@example.com:8888/x/y/z?a=1&b=2&c=&d=4;p1" }
     sample event do
-      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>8888, "username"=>"user", "password"=>"password", "hostname"=>"example.com", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3, "querystring"=>"a=1&b=2&c=&d=4;p1", "query"=>[{:parameter=>"", :value=>"1"}, {:parameter=>"b", :value=>"2"}, {:parameter=>"c", :value=>nil}, {:parameter=>"d", :value=>"4"}, {:parameter=>"p1", :value=>nil}], "num_query"=>5}
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>8888, "username"=>"user", "password"=>"password", "hostname"=>"example.com", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3, "querystring"=>"a=1&b=2&c=&d=4;p1", "query"=>[{:parameter=>"a", :value=>"1"}, {:parameter=>"b", :value=>"2"}, {:parameter=>"c", :value=>nil}, {:parameter=>"d", :value=>"4"}, {:parameter=>"p1", :value=>nil}], "num_query"=>5}
     end
   end
 
@@ -83,7 +83,7 @@ describe LogStash::Filters::URL do
     
     event = { "source_url" => "http://user:password@example.com:8888/x/y/z?a=1&b=2&c=&d=4;p1#f1" }
     sample event do
-      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>8888, "username"=>"user", "password"=>"password", "hostname"=>"example.com", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3, "querystring"=>"a=1&b=2&c=&d=4;p1", "query"=>[{:parameter=>"", :value=>"1"}, {:parameter=>"b", :value=>"2"}, {:parameter=>"c", :value=>nil}, {:parameter=>"d", :value=>"4"}, {:parameter=>"p1", :value=>nil}], "num_query"=>5, "fragment"=>"f1"}
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>8888, "username"=>"user", "password"=>"password", "hostname"=>"example.com", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3, "querystring"=>"a=1&b=2&c=&d=4;p1", "query"=>[{:parameter=>"a", :value=>"1"}, {:parameter=>"b", :value=>"2"}, {:parameter=>"c", :value=>nil}, {:parameter=>"d", :value=>"4"}, {:parameter=>"p1", :value=>nil}], "num_query"=>5, "fragment"=>"f1"}
     end
   end
 
@@ -333,7 +333,7 @@ describe LogStash::Filters::URL do
         "querystring"=>"e=QHucCbLl+/brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC+drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS",
         "query"=> [
           {
-            :parameter=>"",
+            :parameter=>"e",
             :value=>"QHucCbLl+/brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC+drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS"
           }
         ],
@@ -341,6 +341,38 @@ describe LogStash::Filters::URL do
     end
   end
 
-
+  describe "parse url http://180.153.147.73/fsintf/c9f2549fce18f4dc4ae13d6a6527d9c4e/2/GJ3?public&code=9734c07b688b9b0f93d49edb366f9d62" do
+    config STDCONF
+    
+    event = { "source_url" => "http://180.153.147.73/fsintf/c9f2549fce18f4dc4ae13d6a6527d9c4e/2/GJ3?public&code=9734c07b688b9b0f93d49edb366f9d62" }
+    sample event do
+      insist { subject["dest_url"] } == {
+        "scheme"=>"http",
+        "port"=>80,
+        "path"=>"/fsintf/c9f2549fce18f4dc4ae13d6a6527d9c4e/2/GJ3",
+        "filename"=>"GJ3",
+        "num_path"=>4,
+        "querystring"=>"public&code=9734c07b688b9b0f93d49edb366f9d62",
+        "query"=>
+        [
+          {
+            :parameter=>"public", :value=>nil
+          },
+          {
+            :parameter=>"code", :value=>"9734c07b688b9b0f93d49edb366f9d62"
+          }
+        ],
+        "num_query"=>2,
+        "host"=>{
+          "addr"=>
+          {
+            "ip"=>"180.153.147.73",
+            "ipv4"=>"180.153.147.73",
+            "port"=>80
+          }
+        }
+      }
+    end
+  end
   
 end
