@@ -33,6 +33,15 @@ describe LogStash::Filters::URL do
     end
   end
 
+#  describe "parse url some.host.com:80/index.html" do
+#    config STDCONF
+#    
+#    event = { "source_url" =>  "some.host.com:80/index.html"  }
+#    sample event do
+#      insist { subject["dest_url"] } == {"hostname" => "some.host.com", "port" => 80, "path" => "/index.html", "filename" => "index.html"}
+#    end
+#  end
+
   describe "parse url https://user@example.com/x/y/z" do
     config STDCONF
     
@@ -65,7 +74,16 @@ describe LogStash::Filters::URL do
     
     event = { "source_url" => "http://user:password@example.com:8888/x/y/z?a=1&b=2&c=&d=4" }
     sample event do
-      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>8888, "username"=>"user", "password"=>"password", "hostname"=>"example.com", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3, "querystring"=>"a=1&b=2&c=&d=4", "query"=>[{:parameter=>"a", :value=>"1"}, {:parameter=>"b", :value=>"2"}, {:parameter=>"c", :value=>nil}, {:parameter=>"d", :value=>"4"}], "num_query"=>4}
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>8888, "username"=>"user", "password"=>"password", "hostname"=>"example.com", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3, "querystring"=>"a=1&b=2&c=&d=4", "query"=>[{:parameter=>"a", :values=>["1"]}, {:parameter=>"b", :values=>["2"]}, {:parameter=>"c", :values=>[]}, {:parameter=>"d", :values=>["4"]}], "num_query"=>4}
+    end
+  end
+
+  describe "parse url http://user:password@example.com:8888/x/y/z?a=1&b=2&c=&d=4&d=5&d=6" do
+    config STDCONF
+    
+    event = { "source_url" => "http://user:password@example.com:8888/x/y/z?a=1&b=2&c=&d=4&d=5&d=6" }
+    sample event do
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>8888, "username"=>"user", "password"=>"password", "hostname"=>"example.com", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3, "querystring"=>"a=1&b=2&c=&d=4&d=5&d=6", "query"=>[{:parameter=>"a", :values=>["1"]}, {:parameter=>"b", :values=>["2"]}, {:parameter=>"c", :values=>[]}, {:parameter=>"d", :values=>["4", "5", "6"]}], "num_query"=>6}
     end
   end
 
@@ -74,7 +92,7 @@ describe LogStash::Filters::URL do
     
     event = { "source_url" => "http://user:password@example.com:8888/x/y/z?a=1&b=2&c=&d=4;p1" }
     sample event do
-      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>8888, "username"=>"user", "password"=>"password", "hostname"=>"example.com", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3, "querystring"=>"a=1&b=2&c=&d=4;p1", "query"=>[{:parameter=>"a", :value=>"1"}, {:parameter=>"b", :value=>"2"}, {:parameter=>"c", :value=>nil}, {:parameter=>"d", :value=>"4"}, {:parameter=>"p1", :value=>nil}], "num_query"=>5}
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>8888, "username"=>"user", "password"=>"password", "hostname"=>"example.com", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3, "querystring"=>"a=1&b=2&c=&d=4;p1", "query"=>[{:parameter=>"a", :values=>["1"]}, {:parameter=>"b", :values=>["2"]}, {:parameter=>"c", :values=>[]}, {:parameter=>"d", :values=>["4"]}, {:parameter=>"p1", :values=>[]}], "num_query"=>5}
     end
   end
 
@@ -83,7 +101,7 @@ describe LogStash::Filters::URL do
     
     event = { "source_url" => "http://user:password@example.com:8888/x/y/z?a=1&b=2&c=&d=4;p1#f1" }
     sample event do
-      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>8888, "username"=>"user", "password"=>"password", "hostname"=>"example.com", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3, "querystring"=>"a=1&b=2&c=&d=4;p1", "query"=>[{:parameter=>"a", :value=>"1"}, {:parameter=>"b", :value=>"2"}, {:parameter=>"c", :value=>nil}, {:parameter=>"d", :value=>"4"}, {:parameter=>"p1", :value=>nil}], "num_query"=>5, "fragment"=>"f1"}
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>8888, "username"=>"user", "password"=>"password", "hostname"=>"example.com", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3, "querystring"=>"a=1&b=2&c=&d=4;p1", "query"=>[{:parameter=>"a", :values=>["1"]}, {:parameter=>"b", :values=>["2"]}, {:parameter=>"c", :values=>[]}, {:parameter=>"d", :values=>["4"]}, {:parameter=>"p1", :values=>[]}], "num_query"=>5, "fragment"=>"f1"}
     end
   end
 
@@ -258,7 +276,7 @@ describe LogStash::Filters::URL do
     
     event = { "source_url" =>  "http://example/x/y%2Fz"  }
     sample event do
-      insist { subject["dest_url"] } == {"scheme"=>"http", "hostname"=>"example", "path"=>"/x/y%2Fz", "filename"=>"y%2Fz", "num_path"=>2, "port"=>80}
+      insist { subject["dest_url"] } == {"scheme"=>"http", "hostname"=>"example", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3, "port"=>80}
     end
   end
 
@@ -323,21 +341,7 @@ describe LogStash::Filters::URL do
     event = { "source_url" => "http://3pjtx0jj-zxis6jz8.netdna-ssl.com/t.ashx?e=QHucCbLl+/brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC+drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS" }
     #TODO: It's not clear how to split this URL up
     sample event do
-      insist { subject["dest_url"] } == {
-        "scheme"=>"http",
-        "port"=>80,
-        "hostname"=>"3pjtx0jj-zxis6jz8.netdna-ssl.com",
-        "path"=>"/t.ashx",
-        "filename"=>"t.ashx",
-        "num_path"=>1,
-        "querystring"=>"e=QHucCbLl+/brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC+drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS",
-        "query"=> [
-          {
-            :parameter=>"e",
-            :value=>"QHucCbLl+/brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC+drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS"
-          }
-        ],
-        "num_query"=>1}
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "hostname"=>"3pjtx0jj-zxis6jz8.netdna-ssl.com", "path"=>"/t.ashx", "filename"=>"t.ashx", "num_path"=>1, "querystring"=>"e=QHucCbLl+/brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC+drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS", "query"=>[{:parameter=>"e", :values=>["QHucCbLl+/brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC+drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS"]}], "num_query"=>1}
     end
   end
 
@@ -346,32 +350,7 @@ describe LogStash::Filters::URL do
     
     event = { "source_url" => "http://180.153.147.73/fsintf/c9f2549fce18f4dc4ae13d6a6527d9c4e/2/GJ3?public&code=9734c07b688b9b0f93d49edb366f9d62" }
     sample event do
-      insist { subject["dest_url"] } == {
-        "scheme"=>"http",
-        "port"=>80,
-        "path"=>"/fsintf/c9f2549fce18f4dc4ae13d6a6527d9c4e/2/GJ3",
-        "filename"=>"GJ3",
-        "num_path"=>4,
-        "querystring"=>"public&code=9734c07b688b9b0f93d49edb366f9d62",
-        "query"=>
-        [
-          {
-            :parameter=>"public", :value=>nil
-          },
-          {
-            :parameter=>"code", :value=>"9734c07b688b9b0f93d49edb366f9d62"
-          }
-        ],
-        "num_query"=>2,
-        "host"=>{
-          "addr"=>
-          {
-            "ip"=>"180.153.147.73",
-            "ipv4"=>"180.153.147.73",
-            "port"=>80
-          }
-        }
-      }
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "path"=>"/fsintf/c9f2549fce18f4dc4ae13d6a6527d9c4e/2/GJ3", "filename"=>"GJ3", "num_path"=>4, "querystring"=>"public&code=9734c07b688b9b0f93d49edb366f9d62", "query"=>[{:parameter=>"public", :values=>[]}, {:parameter=>"code", :values=>["9734c07b688b9b0f93d49edb366f9d62"]}], "num_query"=>2, "host"=>{"addr"=>{"ip"=>"180.153.147.73", "ipv4"=>"180.153.147.73", "port"=>80}}}
     end
   end
   

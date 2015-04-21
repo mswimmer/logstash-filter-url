@@ -56,11 +56,17 @@ class LogStash::Filters::URL < LogStash::Filters::Base
     end
     url_parts['querystring'] = u.query if u.query
 
-    if url_parts['querystring'] && url_parts['querystring'].length > 1      
-      url_parts['query'] = url_parts['querystring'].split(/[;&]/).map{ |qkv| 
+    if url_parts['querystring'] && url_parts['querystring'].length > 1
+      tmp_hash = {}
+      url_parts['querystring'].split(/[;&]/).map{ |qkv| 
         kv = qkv.split(/=/)
-        { parameter: kv[0], value: kv[1] } 
+        if kv[1]
+          tmp_hash[kv[0]] = (tmp_hash[kv[0]] || []) << kv[1]
+        else
+          tmp_hash[kv[0]] = (tmp_hash[kv[0]] || [])
+        end
       }
+      url_parts['query'] = tmp_hash.map { |k, vs| { parameter: k, values: vs } }  unless tmp_hash.empty?
       url_parts['num_query'] = url_parts['querystring'].split(/[;&]/).select { |p| p.length > 0 }.length
     end
     url_parts['fragment'] = u.fragment if u.fragment
