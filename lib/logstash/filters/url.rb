@@ -2,6 +2,7 @@
 require "logstash/filters/base"
 require "logstash/namespace"
 require 'uri'
+require 'cgi'
 
 class LogStash::Filters::URL < LogStash::Filters::Base
 
@@ -48,14 +49,13 @@ class LogStash::Filters::URL < LogStash::Filters::Base
     url_parts['username'] = u.user if u.user
     url_parts['password'] = u.password if u.password
     url_parts['hostname'] = u.hostname if u.hostname
-    url_parts['path'] = u.path if u.path
+    url_parts['path'] = CGI.unescape(u.path) if u.path
     if url_parts['path']
       path_split = url_parts['path'].split(/\//).select { |p| p.length > 0 }
       url_parts['filename'] = path_split[-1] if path_split[-1]
       url_parts['num_path'] = path_split.length
     end
-    url_parts['querystring'] = u.query if u.query
-
+    url_parts['querystring'] = CGI.unescape(u.query) if u.query
     if url_parts['querystring'] && url_parts['querystring'].length > 1
       tmp_hash = {}
       url_parts['querystring'].split(/[;&]/).map{ |qkv| 

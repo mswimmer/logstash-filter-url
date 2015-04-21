@@ -276,7 +276,7 @@ describe LogStash::Filters::URL do
     
     event = { "source_url" =>  "http://example/x/y%2Fz"  }
     sample event do
-      insist { subject["dest_url"] } == {"scheme"=>"http", "hostname"=>"example", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3, "port"=>80}
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "hostname"=>"example", "path"=>"/x/y/z", "filename"=>"z", "num_path"=>3}
     end
   end
 
@@ -285,7 +285,7 @@ describe LogStash::Filters::URL do
     
     event = { "source_url" =>  "http://example/x%2Fabc"  }
     sample event do
-      insist { subject["dest_url"] } == {"scheme"=>"http", "hostname"=>"example", "path"=>"/x%2Fabc", "filename"=>"x%2Fabc", "num_path"=>1, "port"=>80}
+      insist { subject["dest_url"] } == {"scheme"=>"http", "hostname"=>"example", "path"=>"/x/abc", "filename"=>"abc", "num_path"=>2, "port"=>80}
     end
   end
 
@@ -321,7 +321,7 @@ describe LogStash::Filters::URL do
     
     event = { "source_url" =>  "http://www.w3.org/International/articles/idn-and-iri/JP%E7%B4%8D%E8%B1%86/%E5%BC%95%E3%81%8D%E5%89%B2%E3%82%8A%E7%B4%8D%E8%B1%86.html"  }
     sample event do
-      insist { subject["dest_url"] } == {"scheme"=>"http", "hostname"=>"www.w3.org", "path"=>"/International/articles/idn-and-iri/JP%E7%B4%8D%E8%B1%86/%E5%BC%95%E3%81%8D%E5%89%B2%E3%82%8A%E7%B4%8D%E8%B1%86.html", "filename"=>"%E5%BC%95%E3%81%8D%E5%89%B2%E3%82%8A%E7%B4%8D%E8%B1%86.html", "num_path"=>5, "port"=>80}
+      insist { subject["dest_url"] } == {"scheme"=>"http", "hostname"=>"www.w3.org", "path"=>"/International/articles/idn-and-iri/JP納豆/引き割り納豆.html", "filename"=>"引き割り納豆.html", "num_path"=>5, "port"=>80}
     end
   end
 
@@ -341,7 +341,7 @@ describe LogStash::Filters::URL do
     event = { "source_url" => "http://3pjtx0jj-zxis6jz8.netdna-ssl.com/t.ashx?e=QHucCbLl+/brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC+drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS" }
     #TODO: It's not clear how to split this URL up
     sample event do
-      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "hostname"=>"3pjtx0jj-zxis6jz8.netdna-ssl.com", "path"=>"/t.ashx", "filename"=>"t.ashx", "num_path"=>1, "querystring"=>"e=QHucCbLl+/brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC+drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS", "query"=>[{:parameter=>"e", :values=>["QHucCbLl+/brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC+drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS"]}], "num_query"=>1}
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "hostname"=>"3pjtx0jj-zxis6jz8.netdna-ssl.com", "path"=>"/t.ashx", "filename"=>"t.ashx", "num_path"=>1, "querystring"=>"e=QHucCbLl /brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS", "query"=>[{:parameter=>"e", :values=>["QHucCbLl /brPsk3N17xhG4m/1fBfDFfAZx7JfD/ZiOJSpJdq6tfQE/IV6ft2BimupF1XXIOgnBEfC15jqNt2RHqxF5NXsoLYCpHZc9ZUaGLbhvor/ikhRQC drCF7eFysWDrahxHN2vlPqRFoxtDu0Xbai9dKJl31YkSVL5i4AgQs72aFB5oJ8rnD0zDzgS"]}], "num_query"=>1}
     end
   end
 
