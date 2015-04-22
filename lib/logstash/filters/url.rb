@@ -42,11 +42,10 @@ class LogStash::Filters::URL < LogStash::Filters::Base
 
   private
   def parse(url)
-    fail_it = false
+    retry_count = 0
     url_thing = url.to_s
     url_parts = {}
     begin
-      fail_it = url != url_thing
       #puts "trying #{url_thing}"
       u = URI url_thing
       url_parts['scheme'] = u.scheme
@@ -88,8 +87,8 @@ class LogStash::Filters::URL < LogStash::Filters::Base
     rescue URI::InvalidURIError => e
       $stderr.puts "The URL '#{url_thing}' failed to be parsed. Trying to sanitize it and attempting another parse."
       url_thing = url.gsub(/[^\w\d:;&#\/\.=]/, '+')
-      #
-      retry unless fail_it
+      retry_count += 1
+      retry unless retry_count > 1
       #puts "failing"
     end
     url_parts

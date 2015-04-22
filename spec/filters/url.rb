@@ -371,5 +371,13 @@ describe LogStash::Filters::URL do
       insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "hostname"=>"oq.example.com", "path"=>"/stat.htm", "filename"=>"stat.htm", "num_path"=>1, "querystring"=>"id=30008588&r=&lg=en-us&ntime=none&cnzz_eid=627897484-1429520205-&showp=1024x768&t=undefinedundefinedundefinedundefinedundefinedundefinedundefinedundefinedundefinedundefined...&h=1&rnd=2068194930", "query"=>[{:parameter=>"id", :values=>["30008588"]}, {:parameter=>"r", :values=>[]}, {:parameter=>"lg", :values=>["en-us"]}, {:parameter=>"ntime", :values=>["none"]}, {:parameter=>"cnzz_eid", :values=>["627897484-1429520205-"]}, {:parameter=>"showp", :values=>["1024x768"]}, {:parameter=>"t", :values=>["undefinedundefinedundefinedundefinedundefinedundefinedundefinedundefinedundefinedundefined..."]}, {:parameter=>"h", :values=>["1"]}, {:parameter=>"rnd", :values=>["2068194930"]}], "num_query"=>9}
     end
   end
-  
+
+    describe "parse url http://pomocnik_tso.republika.pl/wersja.ini" do
+    config STDCONF    
+    event = { "source_url" => "http://pomocnik_tso.republika.pl/wersja.ini" }
+    sample event do
+      insist { subject["dest_url"] } == {}
+    end
+  end
+
 end
