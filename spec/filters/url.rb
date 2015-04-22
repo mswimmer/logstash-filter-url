@@ -326,12 +326,12 @@ describe LogStash::Filters::URL do
   end
 
 
-  describe "parse url http://58.64.176.71/Public/home/fonts/glyphicons-halflings-regular.eot?" do
+  describe "parse url http://192.168.2.3/Public/home/fonts/glyphicons-halflings-regular.eot?" do
     config STDCONF
     
-    event = { "source_url" => "http://58.64.176.71/Public/home/fonts/glyphicons-halflings-regular.eot?" }
+    event = { "source_url" => "http://192.168.2.3/Public/home/fonts/glyphicons-halflings-regular.eot?" }
     sample event do
-      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "path"=>"/Public/home/fonts/glyphicons-halflings-regular.eot", "filename"=>"glyphicons-halflings-regular.eot", "num_path"=>4, "querystring"=>"", "host"=>{"addr"=>{"ip"=>"58.64.176.71", "ipv4"=>"58.64.176.71", "port"=>80}}}
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "path"=>"/Public/home/fonts/glyphicons-halflings-regular.eot", "filename"=>"glyphicons-halflings-regular.eot", "num_path"=>4, "querystring"=>"", "host"=>{"addr"=>{"ip"=>"192.168.2.3", "ipv4"=>"192.168.2.3", "port"=>80}}}
     end
   end
 
@@ -345,23 +345,31 @@ describe LogStash::Filters::URL do
     end
   end
 
-  describe "parse url http://180.153.147.73/fsintf/c9f2549fce18f4dc4ae13d6a6527d9c4e/2/GJ3?public&code=9734c07b688b9b0f93d49edb366f9d62" do
+  describe "parse url http://192.168.2.2/fsintf/c9f2549fce18f4dc4ae13d6a6527d9c4e/2/GJ3?public&code=9734c07b688b9b0f93d49edb366f9d62" do
     config STDCONF
     
-    event = { "source_url" => "http://180.153.147.73/fsintf/c9f2549fce18f4dc4ae13d6a6527d9c4e/2/GJ3?public&code=9734c07b688b9b0f93d49edb366f9d62" }
+    event = { "source_url" => "http://192.168.2.2/fsintf/c9f2549fce18f4dc4ae13d6a6527d9c4e/2/GJ3?public&code=9734c07b688b9b0f93d49edb366f9d62" }
     sample event do
-      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "path"=>"/fsintf/c9f2549fce18f4dc4ae13d6a6527d9c4e/2/GJ3", "filename"=>"GJ3", "num_path"=>4, "querystring"=>"public&code=9734c07b688b9b0f93d49edb366f9d62", "query"=>[{:parameter=>"public", :values=>[]}, {:parameter=>"code", :values=>["9734c07b688b9b0f93d49edb366f9d62"]}], "num_query"=>2, "host"=>{"addr"=>{"ip"=>"180.153.147.73", "ipv4"=>"180.153.147.73", "port"=>80}}}
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "path"=>"/fsintf/c9f2549fce18f4dc4ae13d6a6527d9c4e/2/GJ3", "filename"=>"GJ3", "num_path"=>4, "querystring"=>"public&code=9734c07b688b9b0f93d49edb366f9d62", "query"=>[{:parameter=>"public", :values=>[]}, {:parameter=>"code", :values=>["9734c07b688b9b0f93d49edb366f9d62"]}], "num_query"=>2, "host"=>{"addr"=>{"ip"=>"192.168.2.2", "ipv4"=>"192.168.2.2", "port"=>80}}}
     end
   end
 
-    describe "parse url http://cm.hiido.com/cm/user?cm_tc&time=1429548780&domain=yy.com&zds=_736e7fd@yy|_e3d75f1@yy|www@yy|&hiido_ui=0.6427608964783057" do
+    describe "parse url http://cm.example.com/cm/user?cm_tc&time=1429548780&domain=yy.com&zds=_736e7fd@yy|_e3d75f1@yy|www@yy|&hiido_ui=0.6427608964783057" do
     config STDCONF
     
-    event = { "source_url" => "http://cm.hiido.com/cm/user?cm_tc&time=1429548780&domain=yy.com&zds=_736e7fd@yy|_e3d75f1@yy|www@yy|&hiido_ui=0.6427608964783057" }
+    event = { "source_url" => "http://cm.example.com/cm/user?cm_tc&time=1429548780&domain=yy.com&zds=_736e7fd@yy|_e3d75f1@yy|www@yy|&hiido_ui=0.6427608964783057" }
     sample event do
-      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "hostname"=>"cm.hiido.com", "path"=>"/cm/user cm_tc&time 1429548780&domain yy.com&zds _736e7fd yy _e3d75f1 yy www yy &hiido_ui 0.6427608964783057", "filename"=>"user cm_tc&time 1429548780&domain yy.com&zds _736e7fd yy _e3d75f1 yy www yy &hiido_ui 0.6427608964783057", "num_path"=>2}
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "hostname"=>"cm.example.com", "path"=>"/cm/user cm_tc&time=1429548780&domain=yy.com&zds=_736e7fd yy _e3d75f1 yy www yy &hiido_ui=0.6427608964783057", "filename"=>"user cm_tc&time=1429548780&domain=yy.com&zds=_736e7fd yy _e3d75f1 yy www yy &hiido_ui=0.6427608964783057", "num_path"=>2}
     end
   end
   
-
+    describe "parse url http://oq.example.com/stat.htm?id=30008588&r=&lg=en-us&ntime=none&cnzz_eid=627897484-1429520205-&showp=1024x768&t=undefinedundefinedundefinedundefinedundefinedundefinedundefinedundefinedundefinedundefined...&h=1&rnd=2068194930" do
+    config STDCONF
+    
+    event = { "source_url" => "http://oq.example.com/stat.htm?id=30008588&r=&lg=en-us&ntime=none&cnzz_eid=627897484-1429520205-&showp=1024x768&t=undefinedundefinedundefinedundefinedundefinedundefinedundefinedundefinedundefinedundefined...&h=1&rnd=2068194930" }
+    sample event do
+      insist { subject["dest_url"] } == {"scheme"=>"http", "port"=>80, "hostname"=>"oq.example.com", "path"=>"/stat.htm", "filename"=>"stat.htm", "num_path"=>1, "querystring"=>"id=30008588&r=&lg=en-us&ntime=none&cnzz_eid=627897484-1429520205-&showp=1024x768&t=undefinedundefinedundefinedundefinedundefinedundefinedundefinedundefinedundefinedundefined...&h=1&rnd=2068194930", "query"=>[{:parameter=>"id", :values=>["30008588"]}, {:parameter=>"r", :values=>[]}, {:parameter=>"lg", :values=>["en-us"]}, {:parameter=>"ntime", :values=>["none"]}, {:parameter=>"cnzz_eid", :values=>["627897484-1429520205-"]}, {:parameter=>"showp", :values=>["1024x768"]}, {:parameter=>"t", :values=>["undefinedundefinedundefinedundefinedundefinedundefinedundefinedundefinedundefinedundefined..."]}, {:parameter=>"h", :values=>["1"]}, {:parameter=>"rnd", :values=>["2068194930"]}], "num_query"=>9}
+    end
+  end
+  
 end

@@ -86,8 +86,9 @@ class LogStash::Filters::URL < LogStash::Filters::Base
         url_parts.delete 'hostname'
       end
     rescue URI::InvalidURIError => e
-      url_thing = url.gsub(/[^\w\d:;&#\/\.]/, '+')
-      #puts url_thing
+      $stderr.puts "The URL '#{url_thing}' failed to be parsed. Trying to sanitize it and attempting another parse."
+      url_thing = url.gsub(/[^\w\d:;&#\/\.=]/, '+')
+      #
       retry unless fail_it
       #puts "failing"
     end
